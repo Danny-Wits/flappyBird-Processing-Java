@@ -6,11 +6,14 @@ Queue<Pipe> pipeList = new ArrayDeque<>();
 String fileLink = "assests/backgroundImage.png";
 Bird bird ;
 Pipe pipe;
-float gap = 300;
-float gapY=3;
+float gap = 350;
+int gapY=3;
 float speed = 5;
 boolean started=false;
+boolean endScreen=false;
+PFont font ;
 void settings(){
+ 
    size(displayWidth-100,displayHeight-140);
 }
 void setup() {
@@ -23,13 +26,20 @@ void setup() {
 int count = 0;
 int dequeCount = -3 ;
 void draw() {
-    background(backgroundImage);   
+    background(backgroundImage); 
+    if(endScreen){
+        textSize(70);
+        fill(255);
+        textAlign(CENTER,CENTER);
+        text("GAME OVER \n YOUR SCORE :  "+(dequeCount+3)+"\n PRESS 'r' TO CONTINUE",width/2,200 );
+        return;
+    }  
     if(!started){
         bird.show();
         textSize(70);
-        fill(0);
+        fill(255);
         textAlign(CENTER);
-        text("Press enter to start/resume/pause/restart",width/2, height/2);
+        text("PRESS ENTER TO \nSTART/RESTART\nRESUME/PAUSE",width/2, 200);
         return;
     }
     if(count%(60*gapY)==0){
@@ -40,6 +50,10 @@ void draw() {
         }
         if(dequeCount%5==0 && speed<20){            
             speed+=5;
+            if(gapY>1){
+                gapY-=1;
+            }
+           
         }
         dequeCount++;
         count=0;
@@ -62,22 +76,21 @@ void draw() {
     }
 
     if(bird.endGame(pipeList)){
-        textSize(70);
-        fill(255,0,0);
-        textAlign(CENTER,CENTER);
-        text("GAME OVER ",width/2,height/2 );
-        bird = new Bird();
-        started =false;
-        dequeCount=-3;
-        speed = 5;
-        pipeList=new ArrayDeque<Pipe>();
+        endScreen = true;
     }
 }
 void keyPressed() {
-       
-       if (keyCode == ENTER) {
+  
+        if (keyCode == ENTER) {
             started=!started;
         }
+       
+       else if(endScreen){
+         if (key == 'r'){
+            reset();
+       }
+       }
+        
 }
 
 void addPipes(){
@@ -92,4 +105,13 @@ ArrayList<Pipe> createPipePair(){
     pipePair.add(p1);
     pipePair.add(p2);
     return pipePair;
+}
+void reset(){
+    bird = new Bird();
+    dequeCount=-3;
+    speed = 5;
+    endScreen=false;
+    started=false;
+    gapY=3;
+    pipeList=new ArrayDeque<Pipe>();
 }
