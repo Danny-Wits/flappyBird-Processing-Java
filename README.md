@@ -11,8 +11,6 @@ This project is a simple recreation of the classic Flappy Bird game using Proces
 - Simple and intuitive controls
 - Endless gameplay with increasing difficulty
 - Scoring system to track the number of pipes passed
-- Animated bird and pipes for visual appeal
-- Sound effects for jumping and scoring
 
 ## Prerequisites
 
@@ -25,5 +23,5 @@ To run this game, you need to have the following installed on your machine:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/flappy-bird-processing.git
+git clone https://github.com/Danny-Wits/flappy-bird-processing.git
 cd flappy-bird-processing
