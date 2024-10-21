@@ -23,5 +23,5 @@ To run this game, you need to have the following installed on your machine:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/Danny-Wits/flappy-bird-processing.git
-cd flappy-bird-processing
+git clone https://github.com/Danny-Wits/flappyBird-Processing-Java.git
+cd flappyBird-Processing-Java
