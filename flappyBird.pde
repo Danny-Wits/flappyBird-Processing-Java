@@ -1,83 +1,133 @@
-import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.*;
 
 PImage backgroundImage; 
-Queue<Pipe> pipeList = new ArrayDeque<>();
+Queue<PipePair> pipeList = new ArrayDeque<>();
 String fileLink = "assests/backgroundImage.png";
-Bird bird ;
+ArrayList<Bird> birds = new ArrayList<>();
+ArrayList<Bird> birdsToADD = new ArrayList<>();
+ArrayList<Bird> birdsToSUB = new ArrayList<>();
 Pipe pipe;
-float gap = 350;
+float gap = 400;
 int gapY=3;
 float speed = 5;
 boolean started=false;
 boolean endScreen=false;
+int initialBatch=50;
+float learnRate=10;
 PFont font ;
 void settings(){
- 
-   size(displayWidth-100,displayHeight-140);
+   size(displayWidth-300,displayHeight-180);
 }
 void setup() {
-    bird = new Bird();
+    addbirds(initialBatch);
     backgroundImage=loadImage(fileLink);
-    backgroundImage.resize(width,height);
-    
+    backgroundImage.resize(width,height);   
 }
-
+void addbirds(int count ){
+    for (int i = 0; i < count; ++i) {
+        birds.add(new Bird());
+     }
+}
+void addbirds(int count ,Bird parent ,Bird parent2,Bird parent3){
+    if(learnRate>=0.1){
+      learnRate-=0.05;
+    }
+    birds.add(parent);
+    birds.add(parent2);
+    birds.add(parent3);
+    for (int i = 0; i < count; ++i) {
+        birds.add(parent.child(0.1));
+    }
+      for (int i = 0; i < count/2; ++i) {
+        birds.add(parent.child());
+     }
+      for (int i = 0; i < count/2; ++i) {
+        birds.add(parent2.child(0.2));
+     }
+     for (int i = 0; i < count/3; ++i) {
+        birds.add(parent3.child());
+     }
+}
 int count = 0;
 int dequeCount = -3 ;
+int score = 0;
 void draw() {
     background(backgroundImage); 
-    if(endScreen){
-        textSize(70);
-        fill(255);
-        textAlign(CENTER,CENTER);
-        text("GAME OVER \n YOUR SCORE :  "+(dequeCount+3)+"\n PRESS 'r' TO CONTINUE",width/2,200 );
-        return;
-    }  
-    if(!started){
-        bird.show();
-        textSize(70);
-        fill(255);
-        textAlign(CENTER);
-        text("PRESS ENTER TO \nSTART/RESTART\nRESUME/PAUSE",width/2, 200);
-        return;
-    }
+    // if(endScreen){
+    //     textSize(70);
+    //     fill(255);
+    //     textAlign(CENTER,CENTER);
+    //     text("GAME OVER \n YOUR SCORE :  "+(dequeCount+3)+"\n PRESS 'r' TO CONTINUE",width/2,200 );
+    //     return;
+    // }  
+    // if(!started){
+    //     bird.show();
+    //     textSize(70);
+    //     fill(255);
+    //     textAlign(CENTER);
+    //     text("PRESS ENTER TO \nSTART/RESTART\nRESUME/PAUSE",width/2, 200);
+    //     return;
+    // }
     if(count%(60*gapY)==0){
         addPipes();
         if(dequeCount >=0){
             pipeList.poll();
-            pipeList.poll();
-        }
-        if(dequeCount%5==0 && speed<20){            
-            speed+=5;
-            if(gapY>1){
-                gapY-=1;
-            }
-           
         }
         dequeCount++;
         count=0;
     }
     count++;
-    for (Pipe p1 : pipeList) {
-        p1.move();
-        p1.show(); 
+    for (PipePair pp : pipeList) {
+        pp.move();
+        pp.show(); 
     }
     
+    for (Bird  bird : birds) {
     bird.physics();
+    bird.network();
     bird.show();
-    textAlign(CENTER,TOP);
-    fill(255);
-    text("Score : "+(dequeCount+3),width/2,30);
-    if (keyPressed==true) {
-       if(key==' '){
-        bird.flap();
-       }
+   
+    if(birds.size()==3){
+        birdsToADD.add(birds.get(0).child());
+        birdsToADD.add(birds.get(1).child());
+        birdsToADD.add(birds.get(2).child());
+     }
+      if(bird.endGame(pipeList)){
+        birdsToSUB.add(bird);
+     }
+    }
+    if(birdsToADD.size()!=0){
+    birds.addAll(birdsToADD);
+    birdsToADD.clear();
+    }
+    if(birdsToSUB.size()!=0){
+    for (Bird bird : birdsToSUB) {
+        birds.remove(bird);
+    }
+    }
+    if(birds.size()==0){
+        addbirds(20,birdsToSUB.get(birdsToSUB.size()-1),birdsToSUB.get(birdsToSUB.size()-2),birdsToSUB.get(birdsToSUB.size()-2));
+        addbirds(5);
+        reset();
+
+        count = 1;
+        birdsToADD.clear();
+        birdsToSUB.clear();
     }
 
-    if(bird.endGame(pipeList)){
-        endScreen = true;
-    }
+  
+    score = max(score,dequeCount+3);
+    textAlign(CENTER,TOP);
+    fill(255);
+    textSize(50);
+    text("Score : "+ score,width/2,30);
+    // if (keyPressed==true) {
+    //    if(key==' '){
+    //     bird.flap();
+    //    }
+    // }
+
+    
 }
 void keyPressed() {
   
@@ -94,24 +144,23 @@ void keyPressed() {
 }
 
 void addPipes(){
-   pipeList.addAll(createPipePair());
+   pipeList.add(createPipePair());
 }
-ArrayList<Pipe> createPipePair(){
+PipePair createPipePair(){
     
     float partition = random(0,height-gap);
     Pipe p1 = new Pipe(partition-Pipe.sizeY,true);
     Pipe p2 = new Pipe(partition+gap,false);
-    ArrayList<Pipe> pipePair = new ArrayList<Pipe>();
-    pipePair.add(p1);
-    pipePair.add(p2);
-    return pipePair;
+
+    return new PipePair(p1,p2);
 }
 void reset(){
-    bird = new Bird();
+    // bird = new Bird();
     dequeCount=-3;
-    speed = 5;
-    endScreen=false;
-    started=false;
+   // speed = 5;
+  //  endScreen=false;
+  // started=false;
     gapY=3;
-    pipeList=new ArrayDeque<Pipe>();
+    pipeList=new ArrayDeque<PipePair>();
+   pipeList.add(createPipePair());
 }

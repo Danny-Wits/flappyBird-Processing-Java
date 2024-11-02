@@ -22,3 +22,29 @@ public class Pipe {
         return "P";
     }
 }
+class PipePair{
+    public Pipe top;
+    public Pipe bottom;
+    PipePair(Pipe top , Pipe bottom){
+        this.top=top;
+        this.bottom=bottom;
+    }
+    float getT(){
+        return top.y+Pipe.sizeY;
+    }
+    float getB(){
+        return bottom.y;
+    }
+    float getX(){
+        return top.x;
+    }
+    void move(){
+     top.move();
+     bottom.move();
+    }
+    void show(){
+       top.show();
+     bottom.show();
+    }
+
+}
