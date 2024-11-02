@@ -273,9 +273,9 @@ public class Bird  {
         return outOfBound()||collisionCheck(pipeList);
     }
     public boolean outOfBound(){
-        if(position+size>=height) position=height-size;
-        if(position<=0 ) position=0;
-        shuffleWeights();
+        if(position+size>=height){ position=height-size;  shuffleWeights();}
+        if(position<=0 ) { position=0;  shuffleWeights();}
+      
         return false;
     }
     public boolean collisionCheck(Queue<PipePair>pipeList){
