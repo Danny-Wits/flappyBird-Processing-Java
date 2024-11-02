@@ -292,7 +292,7 @@ public class Bird  {
 
 }
 public class Pipe {
-    public float x = width;
+    public float x = width-400;
     public float y = height/2;
     public static final float sizeX =100;
     public static final float sizeY =1000;
